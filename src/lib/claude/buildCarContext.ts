@@ -38,9 +38,9 @@ function currentValue(key: string, display: DisplaySetup): number | number[] | u
     case "wheelRateRear":
       return [display.wheelRate[2], display.wheelRate[3]];
     case "bumpstopRateFront":
-      return [display.bumpStopRateUp[0], display.bumpStopRateUp[1]];
+      return [display.bumpStopRate[0], display.bumpStopRate[1]];
     case "bumpstopRateRear":
-      return [display.bumpStopRateUp[2], display.bumpStopRateUp[3]];
+      return [display.bumpStopRate[2], display.bumpStopRate[3]];
     case "rideHeightFront":
       return display.rideHeightFront;
     case "rideHeightRear":
@@ -96,6 +96,12 @@ export function buildCarContext(car: CarData, display?: DisplaySetup): string {
       }
     }
     lines.push(line);
+  }
+
+  if (display) {
+    lines.push(
+      `Strategy: fuel=${display.fuel}L, tyreSet=${display.tyreSet}, brakePads F/R=${display.frontBrakePadCompound}/${display.rearBrakePadCompound}, fuelMix=${display.fuelMix}`
+    );
   }
 
   return lines.join("\n");

@@ -58,70 +58,14 @@ export interface CarData {
   parameters: CarParameters;
 }
 
-/** [FrontLeft, FrontRight, RearLeft, RearRight] — matches ACC's on-disk wheel order. */
+/** [FrontLeft, FrontRight, RearLeft, RearRight] — wheel order used throughout the setup model. */
 export type WheelTuple = [number, number, number, number];
 
 /**
- * ACC's on-disk setup JSON schema, per Documents/Assetto Corsa Competizione/Setups/<Car>/<Track>/*.json.
- * Fields not covered by our per-car parameter tables (strategy, pit strategy, fuel mix, tyre
- * compound choice, engine-computed outputs) are typed loosely and passed through untouched by
- * readSetup/writeSetup rather than interpreted.
+ * A complete setup in real engineering units — the canonical shape produced and consumed by the
+ * manual entry form. There is no raw ACC setup file in this app (PS5 has no file access), so this
+ * is the source of truth rather than a "view" derived from decoding something else.
  */
-export interface RawSetup {
-  carName: string;
-  basicSetup: {
-    tyres: {
-      tyreCompound: number;
-      tyrePressure: WheelTuple;
-    };
-    alignment: {
-      camber: WheelTuple;
-      toe: WheelTuple;
-      casterLF: number;
-      casterRF: number;
-      steerRatio: number;
-    };
-    electronics: {
-      tC1: number;
-      tC2: number;
-      abs: number;
-      eCUMap: number;
-      fuelMix: number;
-      telemetryLaps: number;
-    };
-    strategy: Record<string, unknown>;
-  };
-  advancedSetup: {
-    mechanicalBalance: {
-      aRBFront: number;
-      aRBRear: number;
-      wheelRate: WheelTuple;
-      bumpStopRateUp: WheelTuple;
-      bumpStopRateDn: WheelTuple;
-      bumpStopWindow: WheelTuple;
-      brakeTorque: number;
-      brakeBias: number;
-    };
-    dampers: {
-      bumpSlow: WheelTuple;
-      bumpFast: WheelTuple;
-      reboundSlow: WheelTuple;
-      reboundFast: WheelTuple;
-    };
-    aeroBalance: {
-      rideHeight: WheelTuple;
-      splitter: number;
-      rearWing: number;
-      brakeDuct: [number, number];
-    };
-    drivetrain: {
-      preload: number;
-    };
-  };
-  trackBopType: number;
-}
-
-/** Real-unit view of a setup, produced by readSetup / consumed by writeSetup. */
 export interface DisplaySetup {
   tyrePressure: WheelTuple;
   camber: WheelTuple;
@@ -136,8 +80,7 @@ export interface DisplaySetup {
   aRBFront: number;
   aRBRear: number;
   wheelRate: WheelTuple;
-  bumpStopRateUp: WheelTuple;
-  bumpStopRateDn: WheelTuple;
+  bumpStopRate: WheelTuple;
   bumpStopWindow: WheelTuple;
   brakeTorque: number;
   brakeBias: number;
@@ -152,6 +95,15 @@ export interface DisplaySetup {
   brakeDuctFront: number;
   brakeDuctRear: number;
   preload: number;
+
+  /** No confirmed per-car range in the Step 2 car data — plain integer, ACC typically 1-6. */
+  fuelMix: number;
+
+  fuel: number;
+  tyreSet: number;
+  /** ACC GT3 pad compounds: 1 sprint/qualifying, 2 endurance, 3 wet/cold, 4 practice-only. */
+  frontBrakePadCompound: number;
+  rearBrakePadCompound: number;
 }
 
 export const WHEEL = { FL: 0, FR: 1, RL: 2, RR: 3 } as const;

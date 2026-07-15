@@ -7,10 +7,11 @@ What's Built & Working
 
 Step 1: Project scaffold — Next.js 16 (App Router, TypeScript) + Tailwind, Supabase client wired (src/lib/supabase.ts), deployed to Vercel, confirmed clean load with no console errors. Live at https://project-lightyear-kohl.vercel.app
 Step 2: Car data files — per-car parameter tables (src/data/cars/*.json) for all 5 Phase 1 GT3 cars, extracted from RiddleTime/Race-Element's setup-conversion source. Each parameter is tagged confirmed:true/false depending on whether that car's Race-Element source declared an explicit max/range vs. only a raw click-index passthrough — see Known Issues below.
-Step 3: JSON engine — src/lib/setup/ implements readSetup (raw ACC setup JSON -> real-unit DisplaySetup) and writeSetup (DisplaySetup + base setup -> raw ACC setup JSON) via a generic codec (linear/lut/rawIndex encodings) driven entirely by the Step 2 parameter tables. Vitest added; 27 tests passing including a full round-trip fidelity check (readSetup -> writeSetup reproduces the exact original raw JSON) against a hand-built Porsche 992 GT3 R sample setup.
+Step 3 (SUPERSEDED by Step 7 — see below): originally a JSON read/write engine for raw ACC setup files. Removed in Step 7 once we learned the user races on PS5, which has no file access at all — there is no file to read or write. The Step 2 parameter tables it was built on remain the foundation of the app.
 Step 4: Supabase schema — applied via migration to the live project (uyoczepwruhuvnblbmkd): tables `setups` (car_id, track, name, raw_setup jsonb, notes), `setup_history` (auto-populated by a trigger that snapshots the old raw_setup whenever a setup's raw_setup changes), and `session_notes` (car_id, track, optional setup_id FK, session_type, conditions jsonb, notes). RLS is enabled on all three with an open anon-access policy (see Open Decisions — auth deferred to Phase 4). Verified end-to-end: insert/update/delete via the app's actual anon-key client, trigger fires correctly, cascade delete on setup_history, ON DELETE SET NULL on session_notes.setup_id. Fixed one advisor-flagged issue (mutable search_path on the trigger function); the 3 remaining advisor warnings are the intentional open RLS policies.
 Step 5: Claude API wiring — POST /api/recommendations Next.js route handler. Takes {carId, symptom, cornerPhase?, speedRegime?, conditions?, currentSetup?}, builds a text context block from the car's Step-2 parameter table (values + confirmed/unconfirmed flags, plus current setup values if given), sends it with a condensed race-engineering system prompt to Claude via structured outputs (Zod schema + client.messages.parse), and returns a typed {diagnosis, recommendations[], cautions[]} JSON response. Model: claude-sonnet-5 (STATUS.md originally named claude-sonnet-4-6, a now-previous-generation model; updated after checking current model availability). Verified end-to-end with real API calls for both no-current-setup and with-current-setup cases — output correctly respects each car's confirmed ranges/increments (e.g. suggesting 190 Nm preload from a 170 Nm current value, matching the car's 10 Nm increment) and flags unconfirmed parameters as cautions rather than inventing ranges.
-Step 6: Setups UI — src/app/page.tsx is now the working app (replacing the placeholder landing page): car selector, setup JSON upload (readSetup) + download (raw JSON), a compact current-setup readout, the symptom/conditions form wired to /api/recommendations, a recommendations + cautions display, save/update/load/delete for the `setups` table (Supabase), and a session-note form wired to `session_notes` linked to the loaded setup. Verified end-to-end in a real browser against the live Supabase project: upload decoded correctly (matched the Step 3 test fixture's exact values), save/load round-tripped, a real recommendation call ran and rendered, and a session note saved with the correct setup_id link — then all test data was cleaned up from Supabase afterward. No console errors.
+Step 6 (revised by Step 7 — see below): originally built the setups UI around JSON file upload/download, per Step 3's engine. The upload/download mechanism was removed in Step 7; the save/load/delete-setup and recommendations/session-note UI patterns it established carried forward.
+Step 7: Manual entry form (PS5 correction) — removed all JSON file I/O (no upload, no download, no readSetup/writeSetup/codec) since PS5 has no file access; src/lib/setup/ now only has types.ts (DisplaySetup extended with fuel/tyreSet/brake pad compounds/fuelMix) and carData.ts. src/app/page.tsx is now a full manual entry form covering every category (Tyres, Alignment, Mechanical, Dampers, Aero, Electronics, Drivetrain, Strategy) with per-wheel/per-position granularity matching the car parameter tables — each input shows its real unit and confirmed/unconfirmed range from Step 2's car data, with `<select>` dropdowns for LUT-encoded parameters (caster, wheel rate) since those only take discrete in-game values. Simplified bumpStopRateUp/Dn (an unverified Step 3 assumption) into a single bumpStopRate field, since the driver only ever sees one bump-stop-rate value in-game. Supabase's `setups`/`setup_history` columns renamed raw_setup -> setup_values to match. Verified end-to-end in a real browser: filled all ~64 fields via real keyboard/select input, saved, reloaded the page, loaded the setup back with an exact round-trip, ran a real recommendation referencing the entered values, and deleted the setup — all confirmed via direct SQL checks, no console errors, test data cleaned up afterward.
 
 In Progress
 
@@ -18,7 +19,7 @@ Nothing yet
 
 Up Next
 
-Step 7 (not yet planned): candidates are auth (per-user data, closing the open RLS gap) or GT4 car support
+Step 8 (not yet planned): candidates are auth (per-user data, closing the open RLS gap) or GT4 car support
 
 
 Open Decisions
@@ -28,15 +29,14 @@ GT4 cars: deferred to after Phase 1, no architecture changes needed to add them
 
 Known Issues / Blockers
 
-Car data gaps: Race-Element only fully declares explicit min/max ranges (via its newer ISetupChanger API) for Porsche 992 GT3 R among our 5 cars. For Ferrari 296 GT3, BMW M4 GT3, McLaren 720S GT3 Evo, and Mercedes-AMG GT3 Evo, the following are unconfirmed (formula known, max clicks not published in source): toe front/rear max, brake bias max, brake power max, preload differential max, steering ratio max, bumpstop rate max, ride height max, anti-roll bar max, bumpstop range max, all 4 damper maxes, rear wing max, splitter max, ECU map max, and TC/TC2/ABS ranges entirely. These are flagged with "confirmed": false in each car's JSON. Before Step 5 (recommendations) relies on click-count bounds for these fields, validate against real ACC setup JSON files (e.g. Lon3035/ACC_Setups or JenSeReal/ACC-Setups on GitHub) or in-game.
-bumpStopRateUp/bumpStopRateDn assumption: the real ACC setup schema has two separate bump-stop-rate arrays (Up and Dn), but Race-Element's source only exposes one conversion formula per wheel. The JSON engine applies the same per-car formula to both arrays — reasonable but not verified against a real setup file; revisit if a real setup shows Up and Dn diverging.
+Car data gaps: Race-Element only fully declares explicit min/max ranges (via its newer ISetupChanger API) for Porsche 992 GT3 R among our 5 cars. For Ferrari 296 GT3, BMW M4 GT3, McLaren 720S GT3 Evo, and Mercedes-AMG GT3 Evo, the following are unconfirmed (formula known, max clicks not published in source): toe front/rear max, brake bias max, brake power max, preload differential max, steering ratio max, bumpstop rate max, ride height max, anti-roll bar max, bumpstop range max, all 4 damper maxes, rear wing max, splitter max, ECU map max, and TC/TC2/ABS ranges entirely. These are flagged with "confirmed": false in each car's JSON, and the manual entry form shows "(unconfirmed)" next to those fields instead of a fabricated bound. Validate against real ACC setup JSON files (e.g. Lon3035/ACC_Setups or JenSeReal/ACC-Setups on GitHub) or in-game if precise bounds matter later.
 
 
 Key Decisions Locked In
 
 Stack: Next.js + Tailwind (frontend) + Next.js API routes (backend) + Supabase (Postgres) + Vercel (hosting)
 Car data: Static JSON files, version-pinned to ACC v1.10.4, update manually if BoP changes
-File I/O: Browser file picker (upload) + JSON download — no local filesystem access
+File I/O: None — corrected in Step 7 after learning the user races on PS5 (no file access of any kind). All setup values are entered manually via a form, validated/bounded against the Step 2 car parameter tables, and stored directly in Supabase as real-unit JSON.
 AI layer: Claude API (claude-sonnet-5 — updated from the originally-planned claude-sonnet-4-6, which is now a previous-generation model), wired in Phase 1 Step 5
 Deployment: Hosted web app (Vercel) for mobile accessibility
 
@@ -50,6 +50,19 @@ Mercedes-AMG GT3 Evo
 
 
 Session Notes
+July 2026 — Step 7 Build Session
+
+Critical correction from user: races on PS5, not PC — no file system access exists, so Step 3's JSON engine and Step 6's upload/download UI were built on a wrong assumption and needed to be replaced with a manual entry form
+User asked for an audit-first, approve-before-building workflow — used plan mode: read every affected file, wrote a plan (delete codec/readSetup/writeSetup + tests, extend DisplaySetup, rebuild page.tsx as a manual form, rename the Supabase column, add passWithNoTests), got explicit approval before editing anything
+Deleted src/lib/setup/codec.ts, readSetup.ts, writeSetup.ts, and their Vitest tests, and the RawSetup type; kept types.ts/carData.ts since Step 2's parameter tables are exactly what the manual form needs for units/bounds
+Simplified DisplaySetup's bumpStopRateUp/bumpStopRateDn (a Step 3 unverified assumption) into a single bumpStopRate — the driver only sees one bump-stop value in-game, so the Up/Dn split from the raw file format was never meaningful for manual entry
+Extended DisplaySetup with fuel, tyreSet, front/rearBrakePadCompound, fuelMix — fields the old engine passed through untouched but the "cover all categories including strategy" requirement needed as real fields
+Applied a migration renaming setups.raw_setup/setup_history.raw_setup to setup_values (recreating the trigger, since its WHEN clause references the column name) — tables were empty, zero data-loss rename
+Rebuilt src/app/page.tsx as a ~64-field categorized form (Tyres/Alignment/Mechanical/Dampers/Aero/Electronics/Drivetrain/Strategy), each field driven by its car-data ParamDef for unit/range display and widget type (number input for linear/rawIndex, select for LUT-encoded caster/wheel-rate)
+Hit and resolved a browser-automation quirk (unrelated to the app): synthetic JS-dispatched input/change events silently failed to persist against this React 19 app, while real keyboard input (and the form_input tool) worked reliably — switched test-filling strategy accordingly rather than chasing the synthetic-event path further
+Verified end-to-end in a real browser: filled all ~64 fields via real typing/keyboard input plus form_input for selects, saved (full-form validation correctly required every field), reloaded, loaded the saved setup back with an exact round-trip, ran a real recommendation that correctly cited the entered current values, and deleted the setup — all cross-checked via direct SQL, no console errors, test data cleaned up afterward
+Build, lint, and test (now passWithNoTests, since the deleted engine's tests are gone and there's no complex pure logic left to unit test) all pass
+
 July 2026 — Step 6 Build Session
 
 Rewrote src/app/page.tsx as the actual app (client component): car selector, setup upload/download, current-setup summary readout (tyre pressure, camber F/R, ride height F/R, ARB F/R, brake bias, diff preload, rear wing, splitter, TC/ABS), symptom form, recommendations display, save/load/delete for saved setups, session notes
