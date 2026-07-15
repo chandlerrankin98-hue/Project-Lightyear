@@ -1,0 +1,32 @@
+[
+  {
+    "carId": "ferrari_296_gt3",
+    "displayName": "Ferrari 296 GT3",
+    "class": "GT3",
+    "file": "ferrari-296-gt3.json"
+  },
+  {
+    "carId": "bmw_m4_gt3",
+    "displayName": "BMW M4 GT3",
+    "class": "GT3",
+    "file": "bmw-m4-gt3.json"
+  },
+  {
+    "carId": "porsche_992_gt3_r",
+    "displayName": "Porsche 992 GT3 R",
+    "class": "GT3",
+    "file": "porsche-992-gt3-r.json"
+  },
+  {
+    "carId": "mclaren_720s_gt3_evo",
+    "displayName": "McLaren 720S GT3 Evo",
+    "class": "GT3",
+    "file": "mclaren-720s-gt3-evo.json"
+  },
+  {
+    "carId": "mercedes_amg_gt3_evo",
+    "displayName": "Mercedes-AMG GT3 Evo",
+    "class": "GT3",
+    "file": "mercedes-amg-gt3-evo.json"
+  }
+]

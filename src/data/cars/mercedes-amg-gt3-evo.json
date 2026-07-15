@@ -1,0 +1,350 @@
+{
+  "carId": "mercedes_amg_gt3_evo",
+  "displayName": "Mercedes-AMG GT3 Evo",
+  "class": "GT3",
+  "tyreCompound": "DHF2023",
+  "sourceNote": "Parameter values (ranges, increments, lookup tables) extracted from the numeric setup-conversion constants in RiddleTime/Race-Element (GPLv3, github.com/RiddleTime/Race-Element), Race_Element.Data.ACC/SetupParser/Cars/GT3/*.cs, as of 2026-07-15. These are factual encodings of ACC's own setup file format, not copied source code. Fields with confirmed:false have no declared max/range in that car's Race-Element source (only raw click-index behavior is implemented there) — validate against real setup JSON files before using in production calculations.",
+  "parameters": {
+    "tyrePressure": {
+      "encoding": "linear",
+      "unit": "psi",
+      "min": 20.3,
+      "max": 35,
+      "increment": 0.1,
+      "confirmed": true,
+      "source": "shared-gt3-constant",
+      "perWheel": true
+    },
+    "camberFront": {
+      "encoding": "linear",
+      "unit": "deg",
+      "min": -4,
+      "max": -1.5,
+      "increment": 0.1,
+      "confirmed": true,
+      "source": "shared-gt3-constant",
+      "perWheel": true
+    },
+    "camberRear": {
+      "encoding": "linear",
+      "unit": "deg",
+      "min": -3.5,
+      "max": -1,
+      "increment": 0.1,
+      "confirmed": true,
+      "source": "shared-gt3-constant",
+      "perWheel": true
+    },
+    "toeFront": {
+      "encoding": "linear",
+      "unit": "deg",
+      "min": -0.4,
+      "max": null,
+      "increment": 0.01,
+      "confirmed": false,
+      "source": "unconfirmed (formula confirmed, max not declared in source)"
+    },
+    "toeRear": {
+      "encoding": "linear",
+      "unit": "deg",
+      "min": -0.4,
+      "max": null,
+      "increment": 0.01,
+      "confirmed": false,
+      "source": "unconfirmed (formula confirmed, max not declared in source)"
+    },
+    "caster": {
+      "encoding": "lut",
+      "unit": "deg",
+      "lut": [
+        6,
+        6.2,
+        6.4,
+        6.6,
+        6.7,
+        6.9,
+        7.1,
+        7.3,
+        7.5,
+        7.7,
+        7.9,
+        8.1,
+        8.2,
+        8.4,
+        8.6,
+        8.8,
+        9,
+        9.2,
+        9.4,
+        9.5,
+        9.7,
+        9.9,
+        10.1,
+        10.3,
+        10.5,
+        10.7,
+        10.8,
+        11,
+        11.2,
+        11.4,
+        11.6,
+        11.8,
+        11.9,
+        12.1,
+        12.3,
+        12.5,
+        12.7,
+        12.8,
+        13,
+        13.2,
+        13.4,
+        13.6,
+        13.7,
+        13.9,
+        14.1
+      ],
+      "confirmed": true,
+      "source": "car-file"
+    },
+    "brakeBias": {
+      "encoding": "linear",
+      "unit": "%",
+      "min": 50,
+      "max": null,
+      "increment": 0.2,
+      "confirmed": false,
+      "source": "unconfirmed (formula confirmed, max not declared in source)"
+    },
+    "brakePower": {
+      "encoding": "linear",
+      "unit": "%",
+      "min": 80,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (formula confirmed, max not declared in source)"
+    },
+    "preloadDifferential": {
+      "encoding": "linear",
+      "unit": "Nm",
+      "min": 20,
+      "max": null,
+      "increment": 10,
+      "confirmed": false,
+      "source": "unconfirmed (formula confirmed, max not declared in source)"
+    },
+    "steeringRatio": {
+      "encoding": "linear",
+      "unit": "ratio",
+      "min": 11,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (formula confirmed, max not declared in source)"
+    },
+    "wheelRateFront": {
+      "encoding": "lut",
+      "unit": "N/m",
+      "lut": [
+        130000,
+        143000,
+        155000,
+        171000,
+        187000,
+        202000
+      ],
+      "confirmed": true,
+      "source": "car-file"
+    },
+    "wheelRateRear": {
+      "encoding": "lut",
+      "unit": "N/m",
+      "lut": [
+        71000,
+        83000,
+        95000,
+        107000,
+        119000,
+        131000
+      ],
+      "confirmed": true,
+      "source": "car-file"
+    },
+    "bumpstopRateFront": {
+      "encoding": "linear",
+      "unit": "N/m",
+      "min": 300,
+      "max": null,
+      "increment": 100,
+      "confirmed": false,
+      "source": "unconfirmed (formula confirmed, max not declared in source)"
+    },
+    "bumpstopRateRear": {
+      "encoding": "linear",
+      "unit": "N/m",
+      "min": 300,
+      "max": null,
+      "increment": 100,
+      "confirmed": false,
+      "source": "unconfirmed (formula confirmed, max not declared in source)"
+    },
+    "rideHeightFront": {
+      "encoding": "linear",
+      "unit": "mm",
+      "min": 42,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (formula confirmed, max not declared in source)"
+    },
+    "rideHeightRear": {
+      "encoding": "linear",
+      "unit": "mm",
+      "min": 67,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (formula confirmed, max not declared in source)"
+    },
+    "antiRollBarFront": {
+      "encoding": "rawIndex",
+      "unit": "clicks",
+      "min": 0,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (raw index passthrough in source, max not declared)"
+    },
+    "antiRollBarRear": {
+      "encoding": "rawIndex",
+      "unit": "clicks",
+      "min": 0,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (raw index passthrough in source, max not declared)"
+    },
+    "bumpstopRangeFront": {
+      "encoding": "rawIndex",
+      "unit": "clicks",
+      "min": 0,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (raw index passthrough in source, max not declared)"
+    },
+    "bumpstopRangeRear": {
+      "encoding": "rawIndex",
+      "unit": "clicks",
+      "min": 0,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (raw index passthrough in source, max not declared)"
+    },
+    "damperBumpSlow": {
+      "encoding": "rawIndex",
+      "unit": "clicks",
+      "min": 0,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (default raw index passthrough in source)"
+    },
+    "damperBumpFast": {
+      "encoding": "rawIndex",
+      "unit": "clicks",
+      "min": 0,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (default raw index passthrough in source)"
+    },
+    "damperReboundSlow": {
+      "encoding": "rawIndex",
+      "unit": "clicks",
+      "min": 0,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (default raw index passthrough in source)"
+    },
+    "damperReboundFast": {
+      "encoding": "rawIndex",
+      "unit": "clicks",
+      "min": 0,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (default raw index passthrough in source)"
+    },
+    "rearWing": {
+      "encoding": "rawIndex",
+      "unit": "clicks",
+      "min": 0,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (raw index passthrough in source, max not declared)",
+      "displayOffset": 1,
+      "note": "source adds +1 to raw index for display"
+    },
+    "splitter": {
+      "encoding": "rawIndex",
+      "unit": "clicks",
+      "min": 0,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (raw index passthrough in source, max not declared)",
+      "displayOffset": 1,
+      "note": "source adds +1 to raw index for display"
+    },
+    "brakeDucts": {
+      "encoding": "linear",
+      "unit": "clicks",
+      "min": 0,
+      "max": 6,
+      "increment": 1,
+      "confirmed": true,
+      "source": "shared-gt3-constant",
+      "perPosition": true
+    },
+    "tractionControl": {
+      "encoding": "linear",
+      "unit": "clicks",
+      "min": 0,
+      "max": 11,
+      "increment": 1,
+      "confirmed": false,
+      "source": "gt3-class-typical (unconfirmed per-car)"
+    },
+    "tractionControl2": {
+      "encoding": "linear",
+      "unit": "clicks",
+      "min": 0,
+      "max": 11,
+      "increment": 1,
+      "confirmed": false,
+      "source": "gt3-class-typical (unconfirmed per-car)"
+    },
+    "abs": {
+      "encoding": "linear",
+      "unit": "clicks",
+      "min": 0,
+      "max": 11,
+      "increment": 1,
+      "confirmed": false,
+      "source": "gt3-class-typical (unconfirmed per-car)"
+    },
+    "ecuMap": {
+      "encoding": "linear",
+      "unit": "map#",
+      "min": 1,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (not declared in source for this car)"
+    }
+  }
+}
