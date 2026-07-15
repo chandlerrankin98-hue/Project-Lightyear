@@ -7,6 +7,7 @@ import { buildCarContext } from "@/lib/claude/buildCarContext";
 import { RecommendationSchema } from "@/lib/claude/recommendationSchema";
 import { getCarData, listCarIds } from "@/lib/setup/carData";
 import type { DisplaySetup } from "@/lib/setup/types";
+import { supabase } from "@/lib/supabase";
 
 interface RequestBody {
   carId: string;
@@ -18,6 +19,16 @@ interface RequestBody {
 }
 
 export async function POST(request: Request) {
+  const authHeader = request.headers.get("authorization");
+  const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  if (!token) {
+    return NextResponse.json({ error: "Missing Authorization header." }, { status: 401 });
+  }
+  const { data: userData, error: authError } = await supabase.auth.getUser(token);
+  if (authError || !userData.user) {
+    return NextResponse.json({ error: "Invalid or expired session." }, { status: 401 });
+  }
+
   let body: RequestBody;
   try {
     body = await request.json();

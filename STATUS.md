@@ -13,18 +13,19 @@ Step 5: Claude API wiring — POST /api/recommendations Next.js route handler. T
 Step 6 (revised by Step 7 — see below): originally built the setups UI around JSON file upload/download, per Step 3's engine. The upload/download mechanism was removed in Step 7; the save/load/delete-setup and recommendations/session-note UI patterns it established carried forward.
 Step 7: Manual entry form (PS5 correction) — removed all JSON file I/O (no upload, no download, no readSetup/writeSetup/codec) since PS5 has no file access; src/lib/setup/ now only has types.ts (DisplaySetup extended with fuel/tyreSet/brake pad compounds/fuelMix) and carData.ts. src/app/page.tsx is now a full manual entry form covering every category (Tyres, Alignment, Mechanical, Dampers, Aero, Electronics, Drivetrain, Strategy) with per-wheel/per-position granularity matching the car parameter tables — each input shows its real unit and confirmed/unconfirmed range from Step 2's car data, with `<select>` dropdowns for LUT-encoded parameters (caster, wheel rate) since those only take discrete in-game values. Simplified bumpStopRateUp/Dn (an unverified Step 3 assumption) into a single bumpStopRate field, since the driver only ever sees one bump-stop-rate value in-game. Supabase's `setups`/`setup_history` columns renamed raw_setup -> setup_values to match. Verified end-to-end in a real browser: filled all ~64 fields via real keyboard/select input, saved, reloaded the page, loaded the setup back with an exact round-trip, ran a real recommendation referencing the entered values, and deleted the setup — all confirmed via direct SQL checks, no console errors, test data cleaned up afterward.
 
+Step 8: Auth — closed the open RLS gap. Supabase Auth with email+password, one account (created manually via the dashboard, no signup flow). Migration added user_id (FK to auth.users, cascade) to setups/setup_history/session_notes with indexes, updated the history trigger to carry user_id, dropped the three open anon policies, and added authenticated-only owner policies (auth.uid() = user_id). The app now has an auth gate (sign-in form when logged out, sign-out button in the header), sends user_id on inserts, and attaches the session token as an Authorization header to /api/recommendations, which now verifies it server-side via supabase.auth.getUser() and returns 401 otherwise (that endpoint was independently exploitable for Anthropic API costs even with RLS fixed). Supabase security advisors: zero findings. Verified end-to-end: sign-in gate renders when logged out; unauthenticated and garbage-token API calls get 401; anon REST insert rejected by RLS and anon read sees zero rows; authenticated insert/list/load/recommend/delete all work through the real UI with a real session.
+
 In Progress
 
 Nothing yet
 
 Up Next
 
-Step 8 (not yet planned): candidates are auth (per-user data, closing the open RLS gap) or GT4 car support
+Step 9 (not yet planned): GT4 car support is the remaining deferred item
 
 
 Open Decisions
 
-Supabase auth (multi-device sync): deferred, revisit in Phase 4. Until then, setups/setup_history/session_notes have an intentionally open RLS policy for the anon role (anyone with the public anon key could read/write) — acceptable for a single-user personal tool right now, but must be replaced with per-user policies before this app has more than one user.
 GT4 cars: deferred to after Phase 1, no architecture changes needed to add them
 
 Known Issues / Blockers
@@ -50,6 +51,17 @@ Mercedes-AMG GT3 Evo
 
 
 Session Notes
+July 2026 — Step 8 Build Session
+
+Confirmed with user: goal is security (the anon key is public in the JS bundle, so app-level tricks can't close the gap — only real auth can), method is email+password with a single dashboard-created account
+Applied migration add_auth_owner_scoping: user_id columns (FK auth.users, cascade) + indexes on all three tables, trigger updated to carry user_id into history rows, open anon policies dropped, authenticated-only owner policies added — advisors now report zero findings
+Also locked down /api/recommendations (it never touched Supabase, so RLS alone didn't protect it — anyone could burn Anthropic API credits): server-side bearer-token verification via supabase.auth.getUser(token), 401 without it; client attaches session.access_token
+page.tsx: split into an auth-gate Home (getSession + onAuthStateChange) rendering SignIn or MainApp; sign-out button in header; user_id added to setups/session_notes inserts
+User created their account via the dashboard and signed in themselves (passwords are never typed by the assistant)
+Verified end-to-end: sign-in gate when logged out; 401 for missing/garbage tokens; anon REST insert rejected by RLS (42501) and anon read returns zero rows; authenticated insert (201) with the same payload shape as the UI; UI list/load/recommend (with auth header)/delete all work with a real session; DB left clean
+Sign-out button not explicitly clicked during testing (would have forced a password re-entry) — it drives the same onAuthStateChange -> no-session -> SignIn path already proven at page load
+Build, lint, test all pass
+
 July 2026 — Step 7 Build Session
 
 Critical correction from user: races on PS5, not PC — no file system access exists, so Step 3's JSON engine and Step 6's upload/download UI were built on a wrong assumption and needed to be replaced with a manual entry form
