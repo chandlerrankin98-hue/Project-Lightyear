@@ -81,6 +81,42 @@ function emptyForm(): SetupForm {
   };
 }
 
+/** Blank form, except fields whose car-data param is "fixed" are pre-filled with that locked value. */
+function initialFormFor(car: CarData): SetupForm {
+  const f = emptyForm();
+  const p = car.parameters;
+  const fx = (def: ParamDef): string => (def.encoding === "fixed" ? String(def.value) : "");
+  f.tyrePressure = [fx(p.tyrePressure), fx(p.tyrePressure), fx(p.tyrePressure), fx(p.tyrePressure)];
+  f.camber = [fx(p.camberFront), fx(p.camberFront), fx(p.camberRear), fx(p.camberRear)];
+  f.toe = [fx(p.toeFront), fx(p.toeFront), fx(p.toeRear), fx(p.toeRear)];
+  f.casterLF = fx(p.caster);
+  f.casterRF = fx(p.caster);
+  f.steerRatio = fx(p.steeringRatio);
+  f.tC1 = fx(p.tractionControl);
+  f.tC2 = fx(p.tractionControl2);
+  f.abs = fx(p.abs);
+  f.eCUMap = fx(p.ecuMap);
+  f.aRBFront = fx(p.antiRollBarFront);
+  f.aRBRear = fx(p.antiRollBarRear);
+  f.wheelRate = [fx(p.wheelRateFront), fx(p.wheelRateFront), fx(p.wheelRateRear), fx(p.wheelRateRear)];
+  f.bumpStopRate = [fx(p.bumpstopRateFront), fx(p.bumpstopRateFront), fx(p.bumpstopRateRear), fx(p.bumpstopRateRear)];
+  f.bumpStopWindow = [fx(p.bumpstopRangeFront), fx(p.bumpstopRangeFront), fx(p.bumpstopRangeRear), fx(p.bumpstopRangeRear)];
+  f.brakeBias = fx(p.brakeBias);
+  f.brakeTorque = fx(p.brakePower);
+  f.bumpSlow = [fx(p.damperBumpSlow), fx(p.damperBumpSlow), fx(p.damperBumpSlow), fx(p.damperBumpSlow)];
+  f.bumpFast = [fx(p.damperBumpFast), fx(p.damperBumpFast), fx(p.damperBumpFast), fx(p.damperBumpFast)];
+  f.reboundSlow = [fx(p.damperReboundSlow), fx(p.damperReboundSlow), fx(p.damperReboundSlow), fx(p.damperReboundSlow)];
+  f.reboundFast = [fx(p.damperReboundFast), fx(p.damperReboundFast), fx(p.damperReboundFast), fx(p.damperReboundFast)];
+  f.rideHeightFront = fx(p.rideHeightFront);
+  f.rideHeightRear = fx(p.rideHeightRear);
+  f.splitter = fx(p.splitter);
+  f.rearWing = fx(p.rearWing);
+  f.brakeDuctFront = fx(p.brakeDucts);
+  f.brakeDuctRear = fx(p.brakeDucts);
+  f.preload = fx(p.preloadDifferential);
+  return f;
+}
+
 function formFromDisplay(d: DisplaySetup): SetupForm {
   const out = {} as SetupForm;
   for (const key of Object.keys(d) as (keyof DisplaySetup)[]) {
@@ -130,6 +166,7 @@ function setField(form: SetupForm, key: keyof SetupForm, index: number | undefin
 }
 
 function boundsCaption(def: ParamDef): string {
+  if (def.encoding === "fixed") return `${def.unit}, fixed`;
   if (def.encoding === "lut") return def.confirmed ? `${def.unit}` : `${def.unit}, unconfirmed`;
   const max = def.max === null || def.max === undefined ? "?" : def.max;
   const range = def.confirmed ? `${def.min}–${max}` : `${def.min}–${max}?, unconfirmed`;
@@ -147,6 +184,21 @@ function ParamInput({
   value: string;
   onChange: (v: string) => void;
 }) {
+  if (def.encoding === "fixed") {
+    return (
+      <label className="flex flex-col gap-1 text-xs">
+        <span className="text-zinc-600 dark:text-zinc-400">
+          {label} <span className="text-zinc-400">({boundsCaption(def)})</span>
+        </span>
+        <input
+          value={String(def.value)}
+          disabled
+          readOnly
+          className="rounded-md border border-zinc-200 bg-zinc-100 px-2 py-1.5 text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-500"
+        />
+      </label>
+    );
+  }
   if (def.encoding === "lut") {
     return (
       <label className="flex flex-col gap-1 text-xs">
@@ -329,7 +381,7 @@ function MainApp({ session }: { session: Session }) {
   const car: CarData = getCarData(carId);
   const p = car.parameters;
 
-  const [form, setForm] = useState<SetupForm>(emptyForm());
+  const [form, setForm] = useState<SetupForm>(() => initialFormFor(car));
   const [formError, setFormError] = useState<string | null>(null);
   const [loadedSetupId, setLoadedSetupId] = useState<string | null>(null);
 
@@ -386,7 +438,7 @@ function MainApp({ session }: { session: Session }) {
 
   function handleCarChange(newCarId: string) {
     setCarId(newCarId);
-    setForm(emptyForm());
+    setForm(initialFormFor(getCarData(newCarId)));
     setLoadedSetupId(null);
     setFormError(null);
     setTrack("");
@@ -476,7 +528,7 @@ function MainApp({ session }: { session: Session }) {
   async function handleDeleteSetup(id: string) {
     await supabase.from("setups").delete().eq("id", id);
     if (loadedSetupId === id) {
-      setForm(emptyForm());
+      setForm(initialFormFor(car));
       setLoadedSetupId(null);
     }
     refreshSavedSetups(carId);
