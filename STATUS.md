@@ -9,6 +9,7 @@ Step 1: Project scaffold — Next.js 16 (App Router, TypeScript) + Tailwind, Sup
 Step 2: Car data files — per-car parameter tables (src/data/cars/*.json) for all 5 Phase 1 GT3 cars, extracted from RiddleTime/Race-Element's setup-conversion source. Each parameter is tagged confirmed:true/false depending on whether that car's Race-Element source declared an explicit max/range vs. only a raw click-index passthrough — see Known Issues below.
 Step 3: JSON engine — src/lib/setup/ implements readSetup (raw ACC setup JSON -> real-unit DisplaySetup) and writeSetup (DisplaySetup + base setup -> raw ACC setup JSON) via a generic codec (linear/lut/rawIndex encodings) driven entirely by the Step 2 parameter tables. Vitest added; 27 tests passing including a full round-trip fidelity check (readSetup -> writeSetup reproduces the exact original raw JSON) against a hand-built Porsche 992 GT3 R sample setup.
 Step 4: Supabase schema — applied via migration to the live project (uyoczepwruhuvnblbmkd): tables `setups` (car_id, track, name, raw_setup jsonb, notes), `setup_history` (auto-populated by a trigger that snapshots the old raw_setup whenever a setup's raw_setup changes), and `session_notes` (car_id, track, optional setup_id FK, session_type, conditions jsonb, notes). RLS is enabled on all three with an open anon-access policy (see Open Decisions — auth deferred to Phase 4). Verified end-to-end: insert/update/delete via the app's actual anon-key client, trigger fires correctly, cascade delete on setup_history, ON DELETE SET NULL on session_notes.setup_id. Fixed one advisor-flagged issue (mutable search_path on the trigger function); the 3 remaining advisor warnings are the intentional open RLS policies.
+Step 5: Claude API wiring — POST /api/recommendations Next.js route handler. Takes {carId, symptom, cornerPhase?, speedRegime?, conditions?, currentSetup?}, builds a text context block from the car's Step-2 parameter table (values + confirmed/unconfirmed flags, plus current setup values if given), sends it with a condensed race-engineering system prompt to Claude via structured outputs (Zod schema + client.messages.parse), and returns a typed {diagnosis, recommendations[], cautions[]} JSON response. Model: claude-sonnet-5 (STATUS.md originally named claude-sonnet-4-6, a now-previous-generation model; updated after checking current model availability). Verified end-to-end with real API calls for both no-current-setup and with-current-setup cases — output correctly respects each car's confirmed ranges/increments (e.g. suggesting 190 Nm preload from a 170 Nm current value, matching the car's 10 Nm increment) and flags unconfirmed parameters as cautions rather than inventing ranges.
 
 In Progress
 
@@ -16,8 +17,7 @@ Nothing yet
 
 Up Next
 
-Step 5: Claude API wiring — symptom + setup → recommendations endpoint
-Step 5: Claude API wiring — symptom + setup → recommendations endpoint
+Step 6 (not yet planned): likely the setups UI (save/load/browse) wiring the Step 3 engine + Step 4 schema + Step 5 recommendations together
 
 
 Open Decisions
@@ -36,7 +36,7 @@ Key Decisions Locked In
 Stack: Next.js + Tailwind (frontend) + Next.js API routes (backend) + Supabase (Postgres) + Vercel (hosting)
 Car data: Static JSON files, version-pinned to ACC v1.10.4, update manually if BoP changes
 File I/O: Browser file picker (upload) + JSON download — no local filesystem access
-AI layer: Claude API (claude-sonnet-4-6), wired in Phase 1 Step 5
+AI layer: Claude API (claude-sonnet-5 — updated from the originally-planned claude-sonnet-4-6, which is now a previous-generation model), wired in Phase 1 Step 5
 Deployment: Hosted web app (Vercel) for mobile accessibility
 
 Phase 1 Car List (GT3 only)
@@ -49,6 +49,14 @@ Mercedes-AMG GT3 Evo
 
 
 Session Notes
+July 2026 — Step 5 Build Session
+
+Confirmed with user: use claude-sonnet-5 (not the originally-documented claude-sonnet-4-6, now previous-gen) — good cost/quality fit for structured recommendation output on a personal app
+Added ANTHROPIC_API_KEY to .env.local and Vercel production env (server-side only, no NEXT_PUBLIC_ prefix — confirmed with user before uploading since it's a real secret, unlike the Supabase anon key)
+Built src/lib/claude/: client.ts (server-only Anthropic client), systemPrompt.ts (condensed race-engineering domain knowledge — tyre pressure window, tuning order, ARB/diff/damper/aero balance effects), buildCarContext.ts (renders a car's parameter table + optional current setup values as text for the prompt), recommendationSchema.ts (Zod schema for structured output)
+Built src/app/api/recommendations/route.ts using client.messages.parse() + zodOutputFormat for guaranteed-valid structured output; validates carId/symptom, handles refusal stop_reason and Anthropic API errors
+Verified end-to-end with real API calls (dev server + curl): correct behavior with and without currentSetup, correct validation errors for bad carId/missing symptom, and qualitatively sound engineering advice that respects each car's confirmed/unconfirmed parameter flags from Step 2
+
 July 2026 — Step 4 Build Session
 
 Applied Supabase migration create_setups_session_notes_history: setups, setup_history (trigger-populated), session_notes tables with indexes and foreign keys (setup_history cascades on delete, session_notes.setup_id sets null on delete)
