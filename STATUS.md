@@ -5,7 +5,7 @@ Current Phase
 Phase 1 — Foundation
 What's Built & Working
 
-Nothing yet — project scaffold not started
+Step 1: Project scaffold — Next.js 16 (App Router, TypeScript) + Tailwind, Supabase client wired (src/lib/supabase.ts), deployed to Vercel, confirmed clean load with no console errors. Live at https://project-lightyear-kohl.vercel.app
 
 In Progress
 
@@ -13,7 +13,6 @@ Nothing yet
 
 Up Next
 
-Step 1: Project scaffold — Next.js + Tailwind + Supabase client, deploy to Vercel
 Step 2: Car data files — scrape Race-Element for 5 cars, generate static JSON parameter tables
 Step 3: JSON engine — readSetup / writeSetup with unit tests
 Step 4: Supabase schema — saved setups, session notes, setup history
@@ -48,6 +47,15 @@ Mercedes-AMG GT3 Evo
 
 
 Session Notes
+July 2026 — Step 1 Build Session
+
+Scaffolded Next.js 16 + Tailwind app (create-next-app, TypeScript, App Router, src dir)
+Installed @supabase/supabase-js, added src/lib/supabase.ts client, verified connectivity against live Supabase project
+Set up gh CLI auth and pushed scaffold to GitHub main
+Set up Vercel CLI auth, linked project (lightyear1/project-lightyear), deployed to production
+Added Supabase env vars to Vercel production environment
+Confirmed production URL loads clean in browser with no console errors
+
 July 2026 — Planning Session
 
 Completed full planning session: deployment target, stack, data model, car list
