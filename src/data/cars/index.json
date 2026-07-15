@@ -28,5 +28,71 @@
     "displayName": "Mercedes-AMG GT3 Evo",
     "class": "GT3",
     "file": "mercedes-amg-gt3-evo.json"
+  },
+  {
+    "carId": "alpine_a110_gt4",
+    "displayName": "Alpine A110 GT4 2018",
+    "class": "GT4",
+    "file": "alpine-a110-gt4.json"
+  },
+  {
+    "carId": "amr_v8_vantage_gt4",
+    "displayName": "Aston Martin Vantage AMR GT4 2018",
+    "class": "GT4",
+    "file": "amr-v8-vantage-gt4.json"
+  },
+  {
+    "carId": "audi_r8_gt4",
+    "displayName": "Audi R8 LMS GT4 2016",
+    "class": "GT4",
+    "file": "audi-r8-gt4.json"
+  },
+  {
+    "carId": "bmw_m4_gt4",
+    "displayName": "BMW M4 GT4 2018",
+    "class": "GT4",
+    "file": "bmw-m4-gt4.json"
+  },
+  {
+    "carId": "chevrolet_camaro_gt4r",
+    "displayName": "Chevrolet Camaro GT4 R 2017",
+    "class": "GT4",
+    "file": "chevrolet-camaro-gt4r.json"
+  },
+  {
+    "carId": "ginetta_g55_gt4",
+    "displayName": "Ginetta G55 GT4 2012",
+    "class": "GT4",
+    "file": "ginetta-g55-gt4.json"
+  },
+  {
+    "carId": "ktm_xbow_gt4",
+    "displayName": "KTM Xbow GT4 2016",
+    "class": "GT4",
+    "file": "ktm-xbow-gt4.json"
+  },
+  {
+    "carId": "maserati_mc_gt4",
+    "displayName": "Maserati Gran Turismo MC GT4 2016",
+    "class": "GT4",
+    "file": "maserati-mc-gt4.json"
+  },
+  {
+    "carId": "mclaren_570s_gt4",
+    "displayName": "McLaren 570s GT4 2016",
+    "class": "GT4",
+    "file": "mclaren-570s-gt4.json"
+  },
+  {
+    "carId": "mercedes_amg_gt4",
+    "displayName": "Mercedes AMG GT4 2016",
+    "class": "GT4",
+    "file": "mercedes-amg-gt4.json"
+  },
+  {
+    "carId": "porsche_718_cayman_gt4_mr",
+    "displayName": "Porsche 718 Cayman GT4 MR 2019",
+    "class": "GT4",
+    "file": "porsche-718-cayman-gt4-mr.json"
   }
 ]

@@ -15,22 +15,28 @@ Step 7: Manual entry form (PS5 correction) — removed all JSON file I/O (no upl
 
 Step 8: Auth — closed the open RLS gap. Supabase Auth with email+password, one account (created manually via the dashboard, no signup flow). Migration added user_id (FK to auth.users, cascade) to setups/setup_history/session_notes with indexes, updated the history trigger to carry user_id, dropped the three open anon policies, and added authenticated-only owner policies (auth.uid() = user_id). The app now has an auth gate (sign-in form when logged out, sign-out button in the header), sends user_id on inserts, and attaches the session token as an Authorization header to /api/recommendations, which now verifies it server-side via supabase.auth.getUser() and returns 401 otherwise (that endpoint was independently exploitable for Anthropic API costs even with RLS fixed). Supabase security advisors: zero findings. Verified end-to-end: sign-in gate renders when logged out; unauthenticated and garbage-token API calls get 401; anon REST insert rejected by RLS and anon read sees zero rows; authenticated insert/list/load/recommend/delete all work through the real UI with a real session.
 
+Step 9: GT4 car support — added all 11 GT4 cars Race-Element has source for (Alpine A110, Aston Martin Vantage AMR, Audi R8 LMS, BMW M4, Chevrolet Camaro GT4.R, Ginetta G55, KTM X-Bow, Maserati GranTurismo MC, McLaren 570S, Mercedes-AMG, Porsche 718 Cayman MR), src/data/cars/*.json, same extraction methodology as Step 2 (real values from RiddleTime/Race-Element's GT4/*.cs source, confirmed:true/false per field). Two schema changes were needed since GT4 data didn't fit the GT3-derived assumptions cleanly: (1) a new "fixed" ParamDef encoding (types.ts) for parameters a car locks to a single value in-game (e.g. Alpine's fixed splitter/fast dampers/bumpstop range, BMW M4 GT4 and Chevrolet Camaro GT4.R's single-value caster, Mercedes-AMG GT4's single-value rear wheel rate) — rendered as a disabled, pre-filled input in the manual entry form rather than a fabricated 1-wide range; (2) GT4 uses its own tyre pressure range/compound (17.0-35 psi, DHF2023_GT4) instead of GT3's shared 20.3-35 psi constant — confirmed camber and brake ducts are NOT class-wide shared constants for GT4 the way they are for GT3, so those are read per-car like everything else. tractionControl2 has no GT4 equivalent (Race-Element's GT4 electronics interface only exposes one TC map) so it's uniformly unconfirmed/rawIndex across all 11 cars; electronics (TC/ABS/ECU map) are entirely undeclared for 10 of the 11 cars (only Alpine implements them, same one-confirmed-car pattern as Porsche was for GT3) — left honestly unconfirmed rather than guessing a "class-typical" range. index.json and carData.ts's static import map extended with all 11 cars (class: "GT4"). Verified: tsc, build, lint, and vitest all pass; real-browser end-to-end check on a GT4 car with fixed params (Alpine A110 GT4) confirmed fixed fields render read-only/pre-filled and don't block save, confirmed/unconfirmed captions render correctly, and save/reload/load/delete round-trip cleanly with no console errors.
+
 In Progress
 
 Nothing yet
 
 Up Next
 
-Step 9 (not yet planned): GT4 car support is the remaining deferred item
+Nothing currently planned beyond Phase 1 — GT4 car data gaps (below) should be validated against real setup files if precise bounds become important.
 
 
 Open Decisions
 
-GT4 cars: deferred to after Phase 1, no architecture changes needed to add them
+GT4 cars: added in Step 9, all 11 Race-Element has source for
 
 Known Issues / Blockers
 
-Car data gaps: Race-Element only fully declares explicit min/max ranges (via its newer ISetupChanger API) for Porsche 992 GT3 R among our 5 cars. For Ferrari 296 GT3, BMW M4 GT3, McLaren 720S GT3 Evo, and Mercedes-AMG GT3 Evo, the following are unconfirmed (formula known, max clicks not published in source): toe front/rear max, brake bias max, brake power max, preload differential max, steering ratio max, bumpstop rate max, ride height max, anti-roll bar max, bumpstop range max, all 4 damper maxes, rear wing max, splitter max, ECU map max, and TC/TC2/ABS ranges entirely. These are flagged with "confirmed": false in each car's JSON, and the manual entry form shows "(unconfirmed)" next to those fields instead of a fabricated bound. Validate against real ACC setup JSON files (e.g. Lon3035/ACC_Setups or JenSeReal/ACC-Setups on GitHub) or in-game if precise bounds matter later.
+Car data gaps (GT3): Race-Element only fully declares explicit min/max ranges (via its newer ISetupChanger API) for Porsche 992 GT3 R among our 5 GT3 cars. For Ferrari 296 GT3, BMW M4 GT3, McLaren 720S GT3 Evo, and Mercedes-AMG GT3 Evo, the following are unconfirmed (formula known, max clicks not published in source): toe front/rear max, brake bias max, brake power max, preload differential max, steering ratio max, bumpstop rate max, ride height max, anti-roll bar max, bumpstop range max, all 4 damper maxes, rear wing max, splitter max, ECU map max, and TC/TC2/ABS ranges entirely. These are flagged with "confirmed": false in each car's JSON, and the manual entry form shows "(unconfirmed)" next to those fields instead of a fabricated bound.
+
+Car data gaps (GT4): only Alpine A110 GT4 implements Race-Element's confirmed-range electronics API; the other 10 GT4 cars have TC/ABS/ECU map fully unconfirmed (no declared range at all, not even a guessed one). Several other fields are unconfirmed per-car the same way as the GT3 gaps above (bumpstop rate/range, ARB, dampers, rear wing/splitter clicks, etc. where that specific car's source doesn't declare a bound) — check each car's JSON's `confirmed` flags rather than assuming GT3's gap list applies.
+
+Both: validate against real ACC setup JSON files (e.g. Lon3035/ACC_Setups or JenSeReal/ACC-Setups on GitHub) or in-game if precise bounds matter later.
 
 
 Key Decisions Locked In
@@ -41,7 +47,7 @@ File I/O: None — corrected in Step 7 after learning the user races on PS5 (no 
 AI layer: Claude API (claude-sonnet-5 — updated from the originally-planned claude-sonnet-4-6, which is now a previous-generation model), wired in Phase 1 Step 5
 Deployment: Hosted web app (Vercel) for mobile accessibility
 
-Phase 1 Car List (GT3 only)
+Phase 1 Car List (GT3)
 
 McLaren 720S GT3 Evo
 Ferrari 296 GT3
@@ -49,8 +55,34 @@ BMW M4 GT3
 Porsche 992 GT3 R
 Mercedes-AMG GT3 Evo
 
+GT4 Car List (Step 9)
+
+Alpine A110 GT4 2018
+Aston Martin Vantage AMR GT4 2018
+Audi R8 LMS GT4 2016
+BMW M4 GT4 2018
+Chevrolet Camaro GT4 R 2017
+Ginetta G55 GT4 2012
+KTM Xbow GT4 2016
+Maserati Gran Turismo MC GT4 2016
+McLaren 570s GT4 2016
+Mercedes AMG GT4 2016
+Porsche 718 Cayman GT4 MR 2019
+
 
 Session Notes
+July 2026 — Step 9 Build Session
+
+Confirmed with user (via plan-mode Q&A, mirroring Step 7's audit-first workflow): add all 11 GT4 cars Race-Element has source for (not a smaller subset), and represent locked/non-adjustable parameters with a new dedicated "fixed" ParamDef encoding rather than omitting the field or faking a zero-width range
+Read RiddleTime/Race-Element's SetupConverter.cs shared interfaces/constants directly to ground the extraction methodology before delegating: confirmed GT4 has its own shared TyrePressuresGT4 constant (17.0-35 psi) but, unlike GT3, no shared camber/brake-ducts constants (those must come from each car's own file); confirmed GT4's electronics interface has no TC2 field at all (GT3's TC1/TC2 split doesn't exist for GT4); confirmed ConversionFactory.cs's exact carId/displayName pairs for all 11 cars to avoid inventing names
+types.ts: added "fixed" to ParamEncoding plus an optional `value` field on ParamDef; kept CarParameters' existing 31 required keys unchanged (every car still declares all 31, just with the new encoding where locked)
+page.tsx: ParamInput renders a disabled, pre-filled input for "fixed" params instead of an editable control; added initialFormFor(car) (mirrors emptyForm() but pre-fills fixed-encoding fields via the same per-field CarParameters->SetupForm mapping already used in the JSX) and wired it into the initial form state, car-change, and delete-loaded-setup paths so fixed fields are never blank and don't block the "every field required" save validation
+Delegated the actual 11-car data extraction (real Race-Element C# source -> JSON) to 3 parallel subagents (4/4/3 cars) with an identical, heavily-specified prompt (exact schema example, exact GT4-vs-GT3 constant differences, exact fixed-encoding trigger condition) to keep methodology consistent across independently-run agents; verified all 11 outputs afterward with a script checking exact 31-key parameter sets, valid encodings, correct fixed-encoding shape, and GT4 (not GT3) tyre pressure range — all passed with no corrections needed
+9 fixed params found across 4 cars: Alpine A110 GT4 (6 — bumpstop range F/R, damper bump/rebound fast, splitter, ECU map), BMW M4 GT4 (1 — caster, single-entry LUT collapsed to fixed), Chevrolet Camaro GT4.R (1 — caster), Mercedes-AMG GT4 (1 — rear wheel rate)
+index.json and carData.ts's static import map extended with all 11 new cars (class: "GT4"); both already generic/car-agnostic so no other code changes needed there; Supabase's car_id column is plain text with no constraint, so no migration needed
+Verified end-to-end: tsc --noEmit, npm run build, npm run lint, npm test all pass; real browser check selecting a GT4 car with fixed params, confirming fixed fields show read-only/pre-filled (not blank, not editable) and the rest of the form still validates/saves/loads/deletes correctly, no console errors
+.env.local (gitignored) had to be copied into the worktree manually before build/dev would run — worktrees don't inherit untracked files
+
 July 2026 — Step 8 Build Session
 
 Confirmed with user: goal is security (the anon key is public in the JS bundle, so app-level tricks can't close the gap — only real auth can), method is email+password with a single dashboard-created account

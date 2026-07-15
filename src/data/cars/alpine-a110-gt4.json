@@ -1,0 +1,321 @@
+{
+  "carId": "alpine_a110_gt4",
+  "displayName": "Alpine A110 GT4 2018",
+  "class": "GT4",
+  "tyreCompound": "DHF2023_GT4",
+  "sourceNote": "Parameter values (ranges, increments, lookup tables) extracted from the numeric setup-conversion constants in RiddleTime/Race-Element (GPLv3, github.com/RiddleTime/Race-Element), Race_Element.Data.ACC/SetupParser/Cars/GT4/AlpineA110GT4.cs, as of 2026-07-15. These are factual encodings of ACC's own setup file format, not copied source code. Fields with confirmed:false have no declared max/range in that car's Race-Element source (only raw click-index behavior is implemented there) — validate against real setup JSON files before using in production calculations.",
+  "parameters": {
+    "tyrePressure": {
+      "encoding": "linear",
+      "unit": "psi",
+      "min": 17.0,
+      "max": 35,
+      "increment": 0.1,
+      "confirmed": true,
+      "source": "shared-gt4-constant",
+      "perWheel": true
+    },
+    "camberFront": {
+      "encoding": "linear",
+      "unit": "deg",
+      "min": -5.0,
+      "max": 0.0,
+      "increment": 0.1,
+      "confirmed": true,
+      "source": "car-file",
+      "perWheel": true
+    },
+    "camberRear": {
+      "encoding": "linear",
+      "unit": "deg",
+      "min": -5.0,
+      "max": 0.0,
+      "increment": 0.1,
+      "confirmed": true,
+      "source": "car-file",
+      "perWheel": true
+    },
+    "toeFront": {
+      "encoding": "linear",
+      "unit": "deg",
+      "min": -0.4,
+      "max": 0.4,
+      "increment": 0.01,
+      "confirmed": true,
+      "source": "car-file"
+    },
+    "toeRear": {
+      "encoding": "linear",
+      "unit": "deg",
+      "min": -0.4,
+      "max": 0.4,
+      "increment": 0.01,
+      "confirmed": true,
+      "source": "car-file"
+    },
+    "caster": {
+      "encoding": "lut",
+      "unit": "deg",
+      "lut": [
+        7.3,
+        7.5,
+        7.7,
+        7.9,
+        8.1,
+        8.3,
+        8.5,
+        8.6,
+        8.8,
+        9.0,
+        9.2,
+        9.4,
+        9.6,
+        9.8,
+        10.0,
+        10.1,
+        10.3,
+        10.5,
+        10.7,
+        10.9,
+        11.1,
+        11.3,
+        11.5,
+        11.6,
+        11.8,
+        12.0,
+        12.2,
+        12.4,
+        12.6,
+        12.7,
+        12.9,
+        13.1,
+        13.3,
+        13.5,
+        13.7
+      ],
+      "confirmed": true,
+      "source": "car-file"
+    },
+    "brakeBias": {
+      "encoding": "linear",
+      "unit": "%",
+      "min": 45.0,
+      "max": 70.0,
+      "increment": 0.2,
+      "confirmed": true,
+      "source": "car-file"
+    },
+    "brakePower": {
+      "encoding": "linear",
+      "unit": "%",
+      "min": 80,
+      "max": 100,
+      "increment": 1,
+      "confirmed": true,
+      "source": "car-file"
+    },
+    "preloadDifferential": {
+      "encoding": "linear",
+      "unit": "Nm",
+      "min": 10,
+      "max": 80,
+      "increment": 10,
+      "confirmed": true,
+      "source": "car-file"
+    },
+    "steeringRatio": {
+      "encoding": "linear",
+      "unit": "ratio",
+      "min": 12,
+      "max": 18,
+      "increment": 1,
+      "confirmed": true,
+      "source": "car-file"
+    },
+    "wheelRateFront": {
+      "encoding": "lut",
+      "unit": "N/m",
+      "lut": [
+        62500,
+        72500,
+        82500,
+        92500
+      ],
+      "confirmed": true,
+      "source": "car-file"
+    },
+    "wheelRateRear": {
+      "encoding": "lut",
+      "unit": "N/m",
+      "lut": [
+        73300,
+        83300,
+        93300,
+        103300
+      ],
+      "confirmed": true,
+      "source": "car-file"
+    },
+    "bumpstopRateFront": {
+      "encoding": "linear",
+      "unit": "N/m",
+      "min": 300,
+      "max": 1000,
+      "increment": 100,
+      "confirmed": true,
+      "source": "car-file"
+    },
+    "bumpstopRateRear": {
+      "encoding": "linear",
+      "unit": "N/m",
+      "min": 300,
+      "max": 1000,
+      "increment": 100,
+      "confirmed": true,
+      "source": "car-file"
+    },
+    "rideHeightFront": {
+      "encoding": "linear",
+      "unit": "mm",
+      "min": 95,
+      "max": 120,
+      "increment": 1,
+      "confirmed": true,
+      "source": "car-file"
+    },
+    "rideHeightRear": {
+      "encoding": "linear",
+      "unit": "mm",
+      "min": 85,
+      "max": 125,
+      "increment": 1,
+      "confirmed": true,
+      "source": "car-file"
+    },
+    "antiRollBarFront": {
+      "encoding": "rawIndex",
+      "unit": "clicks",
+      "min": 0,
+      "max": 3,
+      "increment": 1,
+      "confirmed": true,
+      "source": "car-file"
+    },
+    "antiRollBarRear": {
+      "encoding": "rawIndex",
+      "unit": "clicks",
+      "min": 0,
+      "max": 2,
+      "increment": 1,
+      "confirmed": true,
+      "source": "car-file"
+    },
+    "bumpstopRangeFront": {
+      "encoding": "fixed",
+      "unit": "clicks",
+      "value": 0,
+      "confirmed": true,
+      "source": "car-file (fixed, not adjustable)"
+    },
+    "bumpstopRangeRear": {
+      "encoding": "fixed",
+      "unit": "clicks",
+      "value": 0,
+      "confirmed": true,
+      "source": "car-file (fixed, not adjustable)"
+    },
+    "damperBumpSlow": {
+      "encoding": "rawIndex",
+      "unit": "clicks",
+      "min": 0,
+      "max": 24,
+      "increment": 1,
+      "confirmed": true,
+      "source": "car-file"
+    },
+    "damperBumpFast": {
+      "encoding": "fixed",
+      "unit": "clicks",
+      "value": 0,
+      "confirmed": true,
+      "source": "car-file (fixed, not adjustable)"
+    },
+    "damperReboundSlow": {
+      "encoding": "rawIndex",
+      "unit": "clicks",
+      "min": 0,
+      "max": 24,
+      "increment": 1,
+      "confirmed": true,
+      "source": "car-file"
+    },
+    "damperReboundFast": {
+      "encoding": "fixed",
+      "unit": "clicks",
+      "value": 0,
+      "confirmed": true,
+      "source": "car-file (fixed, not adjustable)"
+    },
+    "rearWing": {
+      "encoding": "rawIndex",
+      "unit": "clicks",
+      "min": 0,
+      "max": 4,
+      "increment": 1,
+      "confirmed": true,
+      "source": "car-file",
+      "displayOffset": 0
+    },
+    "splitter": {
+      "encoding": "fixed",
+      "unit": "clicks",
+      "value": 0,
+      "confirmed": true,
+      "source": "car-file (fixed, not adjustable)"
+    },
+    "brakeDucts": {
+      "encoding": "linear",
+      "unit": "clicks",
+      "min": 0,
+      "max": 6,
+      "increment": 1,
+      "confirmed": true,
+      "source": "car-file (reuses shared BrakeDuctsGT3 constant; no GT4-specific brake-ducts constant declared in SetupConverter.cs)",
+      "perPosition": true
+    },
+    "tractionControl": {
+      "encoding": "linear",
+      "unit": "clicks",
+      "min": 0,
+      "max": 5,
+      "increment": 1,
+      "confirmed": true,
+      "source": "car-file"
+    },
+    "tractionControl2": {
+      "encoding": "rawIndex",
+      "unit": "clicks",
+      "min": 0,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (GT4 cars in Race-Element expose only a single traction-control map, no TC2)"
+    },
+    "abs": {
+      "encoding": "linear",
+      "unit": "clicks",
+      "min": 0,
+      "max": 10,
+      "increment": 1,
+      "confirmed": true,
+      "source": "car-file"
+    },
+    "ecuMap": {
+      "encoding": "fixed",
+      "unit": "map#",
+      "value": 1,
+      "confirmed": true,
+      "source": "car-file (fixed, not adjustable)"
+    }
+  }
+}

@@ -1,0 +1,329 @@
+{
+  "carId": "porsche_718_cayman_gt4_mr",
+  "displayName": "Porsche 718 Cayman GT4 MR 2019",
+  "class": "GT4",
+  "tyreCompound": "DHF2023_GT4",
+  "sourceNote": "Parameter values (ranges, increments, lookup tables) extracted from the numeric setup-conversion constants in RiddleTime/Race-Element (GPLv3, github.com/RiddleTime/Race-Element), Race_Element.Data.ACC/SetupParser/Cars/GT4/Porsche718CaymanGT4MR.cs, as of 2026-07-15. These are factual encodings of ACC's own setup file format, not copied source code. Fields with confirmed:false have no declared max/range in that car's Race-Element source (only raw click-index behavior is implemented there) — validate against real setup JSON files before using in production calculations.",
+  "parameters": {
+    "tyrePressure": {
+      "encoding": "linear",
+      "unit": "psi",
+      "min": 17.0,
+      "max": 35,
+      "increment": 0.1,
+      "confirmed": true,
+      "source": "shared-gt4-constant",
+      "perWheel": true
+    },
+    "camberFront": {
+      "encoding": "linear",
+      "unit": "deg",
+      "min": -5.0,
+      "max": null,
+      "increment": 0.1,
+      "confirmed": false,
+      "source": "unconfirmed (formula confirmed, max not declared in source)",
+      "perWheel": true
+    },
+    "camberRear": {
+      "encoding": "linear",
+      "unit": "deg",
+      "min": -5.0,
+      "max": null,
+      "increment": 0.1,
+      "confirmed": false,
+      "source": "unconfirmed (formula confirmed, max not declared in source)",
+      "perWheel": true
+    },
+    "toeFront": {
+      "encoding": "linear",
+      "unit": "deg",
+      "min": -0.4,
+      "max": null,
+      "increment": 0.01,
+      "confirmed": false,
+      "source": "unconfirmed (formula confirmed, max not declared in source)"
+    },
+    "toeRear": {
+      "encoding": "linear",
+      "unit": "deg",
+      "min": -0.4,
+      "max": null,
+      "increment": 0.01,
+      "confirmed": false,
+      "source": "unconfirmed (formula confirmed, max not declared in source)"
+    },
+    "caster": {
+      "encoding": "lut",
+      "unit": "deg",
+      "lut": [
+        7.3,
+        7.4,
+        7.5,
+        7.6,
+        7.7,
+        7.8,
+        7.9,
+        8.0,
+        8.1,
+        8.2,
+        8.3,
+        8.4,
+        8.5,
+        8.6,
+        8.7,
+        8.8,
+        8.9,
+        9.0,
+        9.2,
+        9.3,
+        9.4,
+        9.5,
+        9.6,
+        9.7,
+        9.8,
+        9.9,
+        10.0,
+        10.1,
+        10.2
+      ],
+      "confirmed": true,
+      "source": "car-file"
+    },
+    "brakeBias": {
+      "encoding": "linear",
+      "unit": "%",
+      "min": 45,
+      "max": null,
+      "increment": 0.2,
+      "confirmed": false,
+      "source": "unconfirmed (formula confirmed, max not declared in source)"
+    },
+    "brakePower": {
+      "encoding": "linear",
+      "unit": "%",
+      "min": 80,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (formula confirmed, max not declared in source)"
+    },
+    "preloadDifferential": {
+      "encoding": "linear",
+      "unit": "Nm",
+      "min": 10,
+      "max": null,
+      "increment": 10,
+      "confirmed": false,
+      "source": "unconfirmed (formula confirmed, max not declared in source)"
+    },
+    "steeringRatio": {
+      "encoding": "linear",
+      "unit": "ratio",
+      "min": 15,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (formula confirmed, max not declared in source)"
+    },
+    "wheelRateFront": {
+      "encoding": "lut",
+      "unit": "N/m",
+      "lut": [
+        99000,
+        108000,
+        116000,
+        124000
+      ],
+      "confirmed": true,
+      "source": "car-file"
+    },
+    "wheelRateRear": {
+      "encoding": "lut",
+      "unit": "N/m",
+      "lut": [
+        91000,
+        99000,
+        108000,
+        116000,
+        124000
+      ],
+      "confirmed": true,
+      "source": "car-file"
+    },
+    "bumpstopRateFront": {
+      "encoding": "linear",
+      "unit": "N/m",
+      "min": 300,
+      "max": null,
+      "increment": 100,
+      "confirmed": false,
+      "source": "unconfirmed (formula confirmed, max not declared in source)"
+    },
+    "bumpstopRateRear": {
+      "encoding": "linear",
+      "unit": "N/m",
+      "min": 300,
+      "max": null,
+      "increment": 100,
+      "confirmed": false,
+      "source": "unconfirmed (formula confirmed, max not declared in source)"
+    },
+    "rideHeightFront": {
+      "encoding": "linear",
+      "unit": "mm",
+      "min": 96,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (formula confirmed, max not declared in source)"
+    },
+    "rideHeightRear": {
+      "encoding": "linear",
+      "unit": "mm",
+      "min": 84,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (formula confirmed, max not declared in source)"
+    },
+    "antiRollBarFront": {
+      "encoding": "rawIndex",
+      "unit": "clicks",
+      "min": 0,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (raw index passthrough in source, max not declared)"
+    },
+    "antiRollBarRear": {
+      "encoding": "rawIndex",
+      "unit": "clicks",
+      "min": 0,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (raw index passthrough in source, max not declared)"
+    },
+    "bumpstopRangeFront": {
+      "encoding": "rawIndex",
+      "unit": "clicks",
+      "min": 0,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (raw index passthrough in source, max not declared)"
+    },
+    "bumpstopRangeRear": {
+      "encoding": "rawIndex",
+      "unit": "clicks",
+      "min": 0,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (raw index passthrough in source, max not declared)"
+    },
+    "damperBumpSlow": {
+      "encoding": "rawIndex",
+      "unit": "clicks",
+      "min": 0,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (default raw index passthrough in source)"
+    },
+    "damperBumpFast": {
+      "encoding": "rawIndex",
+      "unit": "clicks",
+      "min": 0,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (default raw index passthrough in source)"
+    },
+    "damperReboundSlow": {
+      "encoding": "rawIndex",
+      "unit": "clicks",
+      "min": 0,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (default raw index passthrough in source)"
+    },
+    "damperReboundFast": {
+      "encoding": "rawIndex",
+      "unit": "clicks",
+      "min": 0,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (default raw index passthrough in source)"
+    },
+    "rearWing": {
+      "encoding": "rawIndex",
+      "unit": "clicks",
+      "min": 0,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (raw index passthrough in source, max not declared)",
+      "displayOffset": 0
+    },
+    "splitter": {
+      "encoding": "rawIndex",
+      "unit": "clicks",
+      "min": 0,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (raw index passthrough in source, max not declared)",
+      "displayOffset": 0
+    },
+    "brakeDucts": {
+      "encoding": "rawIndex",
+      "unit": "clicks",
+      "min": 0,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (raw index passthrough in source, max not declared)",
+      "perPosition": true
+    },
+    "tractionControl": {
+      "encoding": "rawIndex",
+      "unit": "clicks",
+      "min": 0,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (no ElectronicsSetupChanger declared in source for this car)"
+    },
+    "tractionControl2": {
+      "encoding": "rawIndex",
+      "unit": "clicks",
+      "min": 0,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (GT4 cars in Race-Element expose only a single traction-control map, no TC2)"
+    },
+    "abs": {
+      "encoding": "rawIndex",
+      "unit": "clicks",
+      "min": 0,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (no ElectronicsSetupChanger declared in source for this car)"
+    },
+    "ecuMap": {
+      "encoding": "rawIndex",
+      "unit": "clicks",
+      "min": 0,
+      "max": null,
+      "increment": 1,
+      "confirmed": false,
+      "source": "unconfirmed (no ElectronicsSetupChanger declared in source for this car)"
+    }
+  }
+}

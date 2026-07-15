@@ -1,4 +1,4 @@
-export type ParamEncoding = "linear" | "lut" | "rawIndex";
+export type ParamEncoding = "linear" | "lut" | "rawIndex" | "fixed";
 
 export interface ParamDef {
   encoding: ParamEncoding;
@@ -7,6 +7,8 @@ export interface ParamDef {
   max?: number | null;
   increment?: number;
   lut?: number[];
+  /** Only for encoding "fixed" — the single value the car locks this parameter to (not adjustable in-game). */
+  value?: number;
   confirmed: boolean;
   source: string;
   perWheel?: boolean;
