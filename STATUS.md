@@ -10,6 +10,7 @@ Step 2: Car data files — per-car parameter tables (src/data/cars/*.json) for a
 Step 3: JSON engine — src/lib/setup/ implements readSetup (raw ACC setup JSON -> real-unit DisplaySetup) and writeSetup (DisplaySetup + base setup -> raw ACC setup JSON) via a generic codec (linear/lut/rawIndex encodings) driven entirely by the Step 2 parameter tables. Vitest added; 27 tests passing including a full round-trip fidelity check (readSetup -> writeSetup reproduces the exact original raw JSON) against a hand-built Porsche 992 GT3 R sample setup.
 Step 4: Supabase schema — applied via migration to the live project (uyoczepwruhuvnblbmkd): tables `setups` (car_id, track, name, raw_setup jsonb, notes), `setup_history` (auto-populated by a trigger that snapshots the old raw_setup whenever a setup's raw_setup changes), and `session_notes` (car_id, track, optional setup_id FK, session_type, conditions jsonb, notes). RLS is enabled on all three with an open anon-access policy (see Open Decisions — auth deferred to Phase 4). Verified end-to-end: insert/update/delete via the app's actual anon-key client, trigger fires correctly, cascade delete on setup_history, ON DELETE SET NULL on session_notes.setup_id. Fixed one advisor-flagged issue (mutable search_path on the trigger function); the 3 remaining advisor warnings are the intentional open RLS policies.
 Step 5: Claude API wiring — POST /api/recommendations Next.js route handler. Takes {carId, symptom, cornerPhase?, speedRegime?, conditions?, currentSetup?}, builds a text context block from the car's Step-2 parameter table (values + confirmed/unconfirmed flags, plus current setup values if given), sends it with a condensed race-engineering system prompt to Claude via structured outputs (Zod schema + client.messages.parse), and returns a typed {diagnosis, recommendations[], cautions[]} JSON response. Model: claude-sonnet-5 (STATUS.md originally named claude-sonnet-4-6, a now-previous-generation model; updated after checking current model availability). Verified end-to-end with real API calls for both no-current-setup and with-current-setup cases — output correctly respects each car's confirmed ranges/increments (e.g. suggesting 190 Nm preload from a 170 Nm current value, matching the car's 10 Nm increment) and flags unconfirmed parameters as cautions rather than inventing ranges.
+Step 6: Setups UI — src/app/page.tsx is now the working app (replacing the placeholder landing page): car selector, setup JSON upload (readSetup) + download (raw JSON), a compact current-setup readout, the symptom/conditions form wired to /api/recommendations, a recommendations + cautions display, save/update/load/delete for the `setups` table (Supabase), and a session-note form wired to `session_notes` linked to the loaded setup. Verified end-to-end in a real browser against the live Supabase project: upload decoded correctly (matched the Step 3 test fixture's exact values), save/load round-tripped, a real recommendation call ran and rendered, and a session note saved with the correct setup_id link — then all test data was cleaned up from Supabase afterward. No console errors.
 
 In Progress
 
@@ -17,7 +18,7 @@ Nothing yet
 
 Up Next
 
-Step 6 (not yet planned): likely the setups UI (save/load/browse) wiring the Step 3 engine + Step 4 schema + Step 5 recommendations together
+Step 7 (not yet planned): candidates are auth (per-user data, closing the open RLS gap) or GT4 car support
 
 
 Open Decisions
@@ -49,6 +50,15 @@ Mercedes-AMG GT3 Evo
 
 
 Session Notes
+July 2026 — Step 6 Build Session
+
+Rewrote src/app/page.tsx as the actual app (client component): car selector, setup upload/download, current-setup summary readout (tyre pressure, camber F/R, ride height F/R, ARB F/R, brake bias, diff preload, rear wing, splitter, TC/ABS), symptom form, recommendations display, save/load/delete for saved setups, session notes
+Fixed one real eslint-plugin-react-hooks finding (react-hooks/set-state-in-effect): restructured the saved-setups data-fetching effect to chain .then() directly on the Supabase query promise with an ignore-flag cleanup, instead of calling an external useCallback that set state — standard React data-fetching-effect pattern
+Also fixed layout.tsx's leftover "Create Next App" metadata title/description from Step 1 scaffolding
+Verified end-to-end in a real browser (Chrome extension) against the live Supabase project and a real Claude API call: uploaded a hand-built Porsche 992 GT3 R setup JSON (same fixture used in Step 3's Vitest tests) and confirmed the UI decoded it to the exact expected values; saved it, saw it in the saved-setups list, got a real recommendation for "snappy oversteer on throttle exiting slow hairpins" that correctly referenced the loaded setup's actual preload (170 Nm) and ARB (4 clicks) values; saved a session note and confirmed via SQL it linked to the correct setup_id
+Cleaned up all test data (setup + session note) from Supabase after verification so the tables are empty for real use
+Build, lint, and all 27 Vitest tests pass
+
 July 2026 — Step 5 Build Session
 
 Confirmed with user: use claude-sonnet-5 (not the originally-documented claude-sonnet-4-6, now previous-gen) — good cost/quality fit for structured recommendation output on a personal app
