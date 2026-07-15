@@ -8,6 +8,7 @@ What's Built & Working
 Step 1: Project scaffold — Next.js 16 (App Router, TypeScript) + Tailwind, Supabase client wired (src/lib/supabase.ts), deployed to Vercel, confirmed clean load with no console errors. Live at https://project-lightyear-kohl.vercel.app
 Step 2: Car data files — per-car parameter tables (src/data/cars/*.json) for all 5 Phase 1 GT3 cars, extracted from RiddleTime/Race-Element's setup-conversion source. Each parameter is tagged confirmed:true/false depending on whether that car's Race-Element source declared an explicit max/range vs. only a raw click-index passthrough — see Known Issues below.
 Step 3: JSON engine — src/lib/setup/ implements readSetup (raw ACC setup JSON -> real-unit DisplaySetup) and writeSetup (DisplaySetup + base setup -> raw ACC setup JSON) via a generic codec (linear/lut/rawIndex encodings) driven entirely by the Step 2 parameter tables. Vitest added; 27 tests passing including a full round-trip fidelity check (readSetup -> writeSetup reproduces the exact original raw JSON) against a hand-built Porsche 992 GT3 R sample setup.
+Step 4: Supabase schema — applied via migration to the live project (uyoczepwruhuvnblbmkd): tables `setups` (car_id, track, name, raw_setup jsonb, notes), `setup_history` (auto-populated by a trigger that snapshots the old raw_setup whenever a setup's raw_setup changes), and `session_notes` (car_id, track, optional setup_id FK, session_type, conditions jsonb, notes). RLS is enabled on all three with an open anon-access policy (see Open Decisions — auth deferred to Phase 4). Verified end-to-end: insert/update/delete via the app's actual anon-key client, trigger fires correctly, cascade delete on setup_history, ON DELETE SET NULL on session_notes.setup_id. Fixed one advisor-flagged issue (mutable search_path on the trigger function); the 3 remaining advisor warnings are the intentional open RLS policies.
 
 In Progress
 
@@ -15,13 +16,13 @@ Nothing yet
 
 Up Next
 
-Step 4: Supabase schema — saved setups, session notes, setup history
+Step 5: Claude API wiring — symptom + setup → recommendations endpoint
 Step 5: Claude API wiring — symptom + setup → recommendations endpoint
 
 
 Open Decisions
 
-Supabase auth (multi-device sync): deferred, revisit in Phase 4
+Supabase auth (multi-device sync): deferred, revisit in Phase 4. Until then, setups/setup_history/session_notes have an intentionally open RLS policy for the anon role (anyone with the public anon key could read/write) — acceptable for a single-user personal tool right now, but must be replaced with per-user policies before this app has more than one user.
 GT4 cars: deferred to after Phase 1, no architecture changes needed to add them
 
 Known Issues / Blockers
@@ -48,6 +49,13 @@ Mercedes-AMG GT3 Evo
 
 
 Session Notes
+July 2026 — Step 4 Build Session
+
+Applied Supabase migration create_setups_session_notes_history: setups, setup_history (trigger-populated), session_notes tables with indexes and foreign keys (setup_history cascades on delete, session_notes.setup_id sets null on delete)
+Chose open anon-role RLS policy for now (single-user personal tool, auth deferred to Phase 4) after confirming with the user rather than assuming
+Ran get_advisors; fixed the one real issue (log_setup_history had a mutable search_path) via a follow-up migration; remaining 3 warnings are the intentional open RLS policies
+Smoke-tested via raw SQL (trigger fires, history snapshot correct, updated_at bumped, cascade/set-null on delete) and via the app's actual anon-key Supabase client (insert/read/delete all succeed)
+
 July 2026 — Step 3 Build Session
 
 Added Vitest (vitest.config.ts, npm test/test:watch/test:coverage scripts)
